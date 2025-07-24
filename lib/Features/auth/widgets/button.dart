@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class CustomButton extends StatelessWidget {
+  const CustomButton({super.key, required this.name, required this.onPressed});
+  final String name;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 199,
+      height: 53,
+      child: ElevatedButton(
+        onPressed: () {
+          print('CustomButton: Button pressed - $name');
+          onPressed();
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
+        ),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF8EDDFF), Color(0xFF769DAD)],
+            ),
+          ),
+          child: Container(
+            width: 199,
+            height: 53,
+            alignment: Alignment.center,
+            child: Text(
+              name,
+              style: GoogleFonts.roboto(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
