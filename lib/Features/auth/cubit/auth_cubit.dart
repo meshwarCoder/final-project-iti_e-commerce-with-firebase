@@ -81,7 +81,7 @@ class AuthCubit extends Cubit<AuthState> {
             uid: _firebaseAuth.currentUser!.uid,
             fullName: _firebaseAuth.currentUser!.displayName!,
             email: _firebaseAuth.currentUser!.email!,
-            phoneNumber: '',
+            phoneNumber: _firebaseAuth.currentUser?.phoneNumber ?? '',
             address: '',
             password: '',
             gender: '',

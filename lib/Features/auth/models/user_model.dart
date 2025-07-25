@@ -50,29 +50,4 @@ class UserModel {
       'createdAt': createdAt ?? DateTime.now(),
     };
   }
-
-  // Copy with method for updating user data
-  UserModel copyWith({
-    String? uid,
-    String? fullName,
-    String? email,
-    String? phoneNumber,
-    String? address,
-    String? password,
-    String? gender,
-    bool? isAdmin,
-    DateTime? createdAt,
-  }) {
-    return UserModel(
-      uid: uid ?? this.uid,
-      fullName: fullName ?? this.fullName,
-      email: email ?? this.email,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
-      address: address ?? this.address,
-      password: password ?? this.password,
-      gender: gender ?? this.gender,
-      isAdmin: isAdmin ?? this.isAdmin,
-      createdAt: createdAt ?? this.createdAt,
-    );
-  }
 }

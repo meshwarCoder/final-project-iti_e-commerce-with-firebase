@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce/Features/auth/models/user_model.dart';
+import 'package:e_commerce/Features/home/models/product_model.dart';
 import 'package:e_commerce/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -9,6 +10,8 @@ class FirebaseServices {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final GoogleSignIn _googleSignIn = GoogleSignIn();
+  static const String _productsCollection = 'products';
+  static const String _usersCollection = 'users';
 
   //init firebase
   static Future<void> initFirebase() async {
@@ -135,7 +138,10 @@ class FirebaseServices {
 
   //firestore services
   static Future<void> createUserInFirestore(UserModel user) async {
-    await _firestore.collection('users').doc(user.uid).set(user.toMap());
+    await _firestore
+        .collection(_usersCollection)
+        .doc(user.uid)
+        .set(user.toMap());
   }
 
   static Future<bool> checkUserExists(String email) async {
@@ -154,4 +160,33 @@ class FirebaseServices {
       rethrow;
     }
   }
+
+  Future<void> addProduct(ProductModel product) async {
+    // Call the user's CollectionReference to add a new user
+    await _firestore
+        .collection(_productsCollection)
+        .add(product.toFirestore())
+        .then((value) => print("User Added"))
+        .catchError((error) => print("Failed to add user: $error"));
+  }
+
+  static Future<List<ProductModel>> getAllProducts() async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection(_productsCollection)
+          .orderBy('createdAt', descending: true)
+          .get();
+      List<ProductModel> products = [];
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        products.add(ProductModel.fromFirestore(data));
+      }
+      return products;
+    } catch (e) {
+      print('Error fetching products: $e');
+      return [];
+    }
+  }
 }
+
+//get all products
