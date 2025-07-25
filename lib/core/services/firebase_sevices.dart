@@ -7,6 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseServices {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   //init firebase
@@ -134,9 +135,23 @@ class FirebaseServices {
 
   //firestore services
   static Future<void> createUserInFirestore(UserModel user) async {
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .set(user.toMap());
+    await _firestore.collection('users').doc(user.uid).set(user.toMap());
+  }
+
+  static Future<bool> checkUserExists(String email) async {
+    try {
+      final QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 }

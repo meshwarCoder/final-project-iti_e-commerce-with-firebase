@@ -10,22 +10,28 @@ class CustomTextfield extends StatelessWidget {
     required this.hintText,
     this.iconPath,
     this.iconData,
+    this.obscureText = false,
+    this.suffixIcon,
   });
 
   final String? Function(String?)? validation;
   final String hintText;
   final String? iconPath;
   final IconData? iconData;
+  final bool obscureText;
   final TextEditingController controller;
+  final IconButton? suffixIcon;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: TextFormField(
+        obscureText: obscureText,
         controller: controller,
         validator: validation,
         decoration: InputDecoration(
+          suffixIcon: suffixIcon,
           border: OutlineInputBorder(borderSide: BorderSide.none),
           prefixIcon: Padding(
             padding: const EdgeInsets.only(left: 30, right: 20),

@@ -12,17 +12,12 @@ class CustomButton extends StatelessWidget {
       width: 199,
       height: 53,
       child: ElevatedButton(
-        onPressed: () {
-          print('CustomButton: Button pressed - $name');
-          onPressed();
-        },
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           padding: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
         ),
         child: Ink(
           decoration: BoxDecoration(
