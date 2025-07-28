@@ -1,4 +1,7 @@
+import 'package:e_commerce/Features/home/cubit/home_cubit.dart';
+import 'package:e_commerce/core/services/firebase_sevices.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'dart:async';
 
@@ -14,7 +17,12 @@ class _SplashViewState extends State<SplashView> {
   void initState() {
     super.initState();
     Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacementNamed(context, 'LoginView');
+      if (FirebaseServices.isLoggedIn()) {
+        Navigator.pushReplacementNamed(context, 'HomeView');
+        context.read<HomeCubit>().getHomeData();
+      } else {
+        Navigator.pushReplacementNamed(context, 'LoginView');
+      }
     });
   }
 

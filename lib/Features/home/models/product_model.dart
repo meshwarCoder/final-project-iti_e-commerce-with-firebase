@@ -1,12 +1,11 @@
 class ProductModel {
-  final String id;
+  final num id;
   final String title;
   final String description;
-  final double price;
+  final num price;
   final String imageUrl;
-  final String category;
+  final num categoryId;
   final bool isAvailable;
-  final bool isFavorite;
 
   ProductModel({
     required this.id,
@@ -14,9 +13,8 @@ class ProductModel {
     required this.description,
     required this.price,
     required this.imageUrl,
-    required this.category,
+    required this.categoryId,
     required this.isAvailable,
-    required this.isFavorite,
   });
 
   ProductModel.fromFirestore(Map<String, dynamic> json)
@@ -24,10 +22,9 @@ class ProductModel {
       title = json['title'],
       description = json['description'],
       price = json['price'],
-      imageUrl = json['imageUrl'],
+      imageUrl = json['image'],
       isAvailable = json['isAvailable'],
-      isFavorite = json['isFavorite'],
-      category = json['category'];
+      categoryId = json['categoryId'];
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -37,8 +34,6 @@ class ProductModel {
       'price': price,
       'imageUrl': imageUrl,
       'isAvailable': isAvailable,
-      'isFavorite': isFavorite,
-      'category': category,
     };
   }
 }

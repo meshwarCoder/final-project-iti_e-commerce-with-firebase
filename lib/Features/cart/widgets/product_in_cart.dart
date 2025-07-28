@@ -1,0 +1,130 @@
+import 'package:e_commerce/Features/cart/models/cart_model.dart';
+import 'package:e_commerce/core/services/firebase_sevices.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
+class ProductInCart extends StatelessWidget {
+  final CartItemModel cartItem;
+  const ProductInCart({super.key, required this.cartItem});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 6,
+      child: Container(
+        margin: EdgeInsets.all(8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 100,
+              width: 100,
+              child: Image.network(
+                cartItem.imageUrl,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: const Icon(
+                      Icons.image_not_supported,
+                      color: Colors.grey,
+                      size: 50,
+                    ),
+                  );
+                },
+              ),
+            ),
+            SizedBox(width: 10),
+
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      cartItem.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 15),
+                    Text(
+                      cartItem.price.toString(),
+                      style: TextStyle(color: Colors.green),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 40),
+              child: ProductCounter(cartItem: cartItem),
+            ),
+            Spacer(),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: () async {
+                    await FirebaseServices.removeCartItem(
+                      FirebaseAuth.instance.currentUser!.uid,
+                      cartItem.productId,
+                    );
+                  },
+                  icon: const Icon(Icons.delete),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  (cartItem.price * cartItem.quantity).toString(),
+                  style: TextStyle(color: Colors.green),
+                ),
+              ],
+            ),
+            SizedBox(width: 5),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProductCounter extends StatelessWidget {
+  final CartItemModel cartItem;
+  const ProductCounter({super.key, required this.cartItem});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      width: 120,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          IconButton(
+            onPressed: () async {
+              await FirebaseServices.decrementCartItemQuantity(
+                FirebaseAuth.instance.currentUser!.uid,
+                cartItem.productId,
+              );
+            },
+            icon: const Icon(Icons.remove),
+          ),
+          Text(cartItem.quantity.toString()),
+          IconButton(
+            onPressed: () async {
+              await FirebaseServices.incrementCartItemQuantity(
+                FirebaseAuth.instance.currentUser!.uid,
+                cartItem.productId,
+              );
+            },
+            icon: const Icon(Icons.add),
+          ),
+        ],
+      ),
+    );
+  }
+}

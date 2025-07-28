@@ -1,6 +1,7 @@
 import 'package:e_commerce/Features/auth/cubit/auth_cubit.dart';
 import 'package:e_commerce/Features/auth/widgets/button.dart';
 import 'package:e_commerce/Features/auth/widgets/custom_textfield.dart';
+import 'package:e_commerce/Features/home/cubit/home_cubit.dart';
 import 'package:e_commerce/core/services/firebase_sevices.dart';
 import 'package:e_commerce/core/utils/snackbar.dart';
 import 'package:e_commerce/core/utils/vlidation.dart';
@@ -276,6 +277,7 @@ class LoginViewState extends State<LoginView> {
                                   password: passwordController.text,
                                 );
                               }
+                              context.read<HomeCubit>().getHomeData();
                             },
                           ),
                           SizedBox(height: 35),
@@ -308,6 +310,7 @@ class LoginViewState extends State<LoginView> {
                                 onPressed: () {
                                   FirebaseServices.disconnectWithGoogle();
                                   context.read<AuthCubit>().loginWithGoogle();
+                                  context.read<HomeCubit>().getHomeData();
                                 },
                               ),
                               SizedBox(width: 24),

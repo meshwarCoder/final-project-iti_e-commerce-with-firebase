@@ -1,7 +1,13 @@
 import 'package:e_commerce/Features/auth/views/login_view.dart';
 import 'package:e_commerce/Features/auth/views/signup_view.dart';
-import 'package:e_commerce/Features/home/home_view.dart';
+import 'package:e_commerce/Features/cart/cubit/cart_cubit.dart';
+import 'package:e_commerce/Features/cart/views/cart_view.dart';
+import 'package:e_commerce/Features/home/cubit/home_cubit.dart';
+import 'package:e_commerce/Features/home/views/home_view.dart';
+import 'package:e_commerce/Features/orders/views/order_view.dart';
+import 'package:e_commerce/Features/profile/views/profile_view.dart';
 import 'package:e_commerce/Features/splash/views/splash_view.dart';
+import 'package:e_commerce/Features/wishlist/views/wishlist_view.dart';
 import 'package:flutter/material.dart';
 import 'package:e_commerce/core/services/firebase_sevices.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,8 +24,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => AuthCubit()),
+        BlocProvider(create: (context) => HomeCubit()),
+        BlocProvider(create: (context) => CartCubit()),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         initialRoute: 'SplashView',
@@ -28,6 +38,10 @@ class MyApp extends StatelessWidget {
           'LoginView': (context) => LoginView(),
           'SignupView': (context) => const SignupView(),
           'HomeView': (context) => const HomeView(),
+          'CartView': (context) => const CartView(),
+          'OrderView': (context) => OrderView(),
+          'ProfileView': (context) => ProfileView(),
+          'WishlistView': (context) => WishlistView(),
         },
       ),
     );

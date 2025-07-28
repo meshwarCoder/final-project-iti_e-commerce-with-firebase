@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce/Features/auth/models/user_model.dart';
+import 'package:e_commerce/Features/cart/models/cart_model.dart';
 import 'package:e_commerce/Features/home/models/product_model.dart';
 import 'package:e_commerce/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -174,7 +175,6 @@ class FirebaseServices {
     try {
       QuerySnapshot querySnapshot = await _firestore
           .collection(_productsCollection)
-          .orderBy('createdAt', descending: true)
           .get();
       List<ProductModel> products = [];
       for (var doc in querySnapshot.docs) {
@@ -183,10 +183,109 @@ class FirebaseServices {
       }
       return products;
     } catch (e) {
-      print('Error fetching products: $e');
-      return [];
+      throw Exception('Error getting products: $e');
     }
   }
-}
 
-//get all products
+  static Future<void> addToCart({
+    required String userId,
+    required CartItemModel item,
+  }) async {
+    final userCartRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('cart');
+
+    final docRef = userCartRef.doc(
+      item.productId,
+    ); // استخدم productId كـ doc ID
+
+    final doc = await docRef.get();
+
+    if (doc.exists) {
+      final currentQty = doc['quantity'];
+      await docRef.update({'quantity': currentQty + 1});
+    } else {
+      await docRef.set(item.toJson()); // استخدم set بدل add
+    }
+  }
+
+  static Future<List<CartItemModel>> getCartItems(String userId) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('cart')
+        .get();
+
+    return snapshot.docs.map((doc) {
+      return CartItemModel.fromFirestore(doc.data());
+    }).toList();
+  }
+
+  static Future<void> incrementCartItemQuantity(
+    String userId,
+    String productId,
+  ) async {
+    final cartRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('cart');
+
+    // البحث عن المستند الذي يحتوي على productId المطلوب
+    final querySnapshot = await cartRef
+        .where('productId', isEqualTo: productId)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final docId = querySnapshot.docs.first.id;
+      await cartRef.doc(docId).update({'quantity': FieldValue.increment(1)});
+    }
+  }
+
+  static Future<void> decrementCartItemQuantity(
+    String userId,
+    String productId,
+  ) async {
+    final cartRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('cart');
+
+    // البحث عن المستند الذي يحتوي على productId المطلوب
+    final querySnapshot = await cartRef
+        .where('productId', isEqualTo: productId)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final docId = querySnapshot.docs.first.id;
+      final currentQty = querySnapshot.docs.first.data()['quantity'] ?? 1;
+
+      if (currentQty > 1) {
+        await cartRef.doc(docId).update({'quantity': FieldValue.increment(-1)});
+      } else {
+        // حذف المنتج من السلة إذا أصبحت الكمية 0
+        await cartRef.doc(docId).delete();
+      }
+    }
+  }
+
+  Future<bool> isProductInCart(String userId, String productId) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('cart')
+        .doc(productId)
+        .get();
+
+    return doc.exists;
+  }
+
+  static Future<void> removeCartItem(String userId, String productId) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('cart')
+        .doc(productId)
+        .delete();
+  }
+}
