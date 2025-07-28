@@ -27,15 +27,10 @@ class _ProfileTabState extends State<ProfileView> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 50),
 
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey[300],
-              ),
+            CircleAvatar(
+              radius: 65,
               child: Image.network(
                 'hib',
                 fit: BoxFit.cover,

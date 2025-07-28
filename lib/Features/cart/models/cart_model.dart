@@ -13,7 +13,7 @@ class CartItemModel {
     required this.quantity,
   });
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toFirestore() {
     return {
       'productId': productId,
       'title': title,

@@ -37,28 +37,31 @@ class ProductInCart extends StatelessWidget {
 
             Padding(
               padding: const EdgeInsets.only(top: 10),
-              child: Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 180,
+                    child: Text(
                       cartItem.title,
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 15),
-                    Text(
-                      cartItem.price.toString(),
-                      style: TextStyle(color: Colors.green),
-                    ),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: 25),
+                  Row(
+                    children: [
+                      Text(
+                        '\$${cartItem.price}',
+                        style: TextStyle(color: Colors.green),
+                      ),
+                      SizedBox(width: 40),
+                      ProductCounter(cartItem: cartItem),
+                    ],
+                  ),
+                ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 40),
-              child: ProductCounter(cartItem: cartItem),
             ),
             Spacer(),
             Column(
@@ -75,7 +78,7 @@ class ProductInCart extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  (cartItem.price * cartItem.quantity).toString(),
+                  ('\$${cartItem.price * cartItem.quantity}'),
                   style: TextStyle(color: Colors.green),
                 ),
               ],

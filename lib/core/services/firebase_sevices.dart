@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce/Features/auth/models/user_model.dart';
 import 'package:e_commerce/Features/cart/models/cart_model.dart';
 import 'package:e_commerce/Features/home/models/product_model.dart';
+import 'package:e_commerce/Features/orders/models/order_model.dart';
 import 'package:e_commerce/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -206,7 +207,7 @@ class FirebaseServices {
       final currentQty = doc['quantity'];
       await docRef.update({'quantity': currentQty + 1});
     } else {
-      await docRef.set(item.toJson()); // استخدم set بدل add
+      await docRef.set(item.toFirestore()); // استخدم set بدل add
     }
   }
 
@@ -287,5 +288,41 @@ class FirebaseServices {
         .collection('cart')
         .doc(productId)
         .delete();
+  }
+
+  static Future<void> addOrder(OrderModel order) async {
+    final userId = getCurrentUser()!.uid;
+
+    final userDoc = FirebaseFirestore.instance.collection('users').doc(userId);
+    final ordersRef = userDoc.collection('orders');
+    final cartRef = userDoc.collection('cart');
+
+    // 1. جلب كل العناصر من الكارت
+    final cartSnapshot = await cartRef.get();
+
+    // 2. لو الكارت فاضي متعملش أوردر
+    if (cartSnapshot.docs.isEmpty) return;
+
+    // 4. رفع الأوردر
+    await ordersRef.add(order.toFirestore());
+
+    // 5. مسح الكارت بعد نجاح الأوردر
+    for (final doc in cartSnapshot.docs) {
+      await doc.reference.delete();
+    }
+  }
+
+  static Stream<List<OrderModel>> getUserOrders(String userId) {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('orders')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            return OrderModel.fromFirestore(doc.data());
+          }).toList();
+        });
   }
 }

@@ -1,25 +1,13 @@
-import 'package:e_commerce/Features/cart/widgets/product_in_cart.dart';
 import 'package:e_commerce/Features/orders/models/order_model.dart';
 import 'package:e_commerce/Features/orders/widgets/order_item.dart';
 import 'package:e_commerce/core/constant/colors.dart';
+import 'package:e_commerce/core/services/firebase_sevices.dart';
 import 'package:e_commerce/core/widgets/Custom_appbar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class OrderView extends StatelessWidget {
-  final List<Order> orders = [
-    Order(
-      orderId: '1',
-      totalPrice: 100.0,
-      products: ['Product 1', 'Product 2'],
-    ),
-    Order(
-      orderId: '2',
-      totalPrice: 150.0,
-      products: ['Product 3', 'Product 4'],
-    ),
-  ];
-
-  OrderView({super.key});
+  const OrderView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -80,101 +68,130 @@ class OrderView extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Container(
-            height: 180,
-            margin: const EdgeInsets.all(8),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey,
-                  blurRadius: 2.0,
-                  spreadRadius: 0.0,
-                  offset: Offset(0, 2), // changes position of shadow
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Spacer(),
-                      Icon(
-                        Icons.shopping_cart_outlined,
-                        color: KColors.primaryColor,
-                        size: 40,
-                      ),
-                      Spacer(),
-                      Text(
-                        '10',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: KColors.primaryColor,
-                        ),
-                      ),
-                      Spacer(),
-                      Text(
-                        'Orders',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: KColors.primaryColor,
-                        ),
-                      ),
-                      Spacer(),
-                    ],
-                  ),
-                ),
-                VerticalDivider(color: KColors.primaryColor),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Spacer(),
-                      Icon(
-                        Icons.attach_money_outlined,
-                        color: KColors.primaryColor,
-                        size: 40,
-                      ),
-                      Spacer(),
-                      Text(
-                        '\$1000',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: KColors.primaryColor,
-                        ),
-                      ),
-                      Spacer(),
-                      Text(
-                        'Total',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: KColors.primaryColor,
-                        ),
-                      ),
-                      Spacer(),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
           Expanded(
-            child: ListView(
-              children: orders
-                  .map(
-                    (order) => Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: OrderItem(order: order),
+            child: StreamBuilder<List<OrderModel>>(
+              stream: FirebaseServices.getUserOrders(
+                FirebaseAuth.instance.currentUser!.uid,
+              ),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No Orders Found'));
+                }
+
+                final ordersList = snapshot.data!;
+
+                final totalAmount = ordersList.fold<num>(
+                  0,
+                  (sum, order) => sum + order.totalPrice,
+                );
+
+                return Column(
+                  children: [
+                    Container(
+                      height: 180,
+                      margin: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 2.0,
+                            spreadRadius: 0.0,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              children: [
+                                const Spacer(),
+                                const Icon(
+                                  Icons.shopping_cart_outlined,
+                                  color: KColors.primaryColor,
+                                  size: 40,
+                                ),
+                                const Spacer(),
+                                Text(
+                                  ordersList.length.toString(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: KColors.primaryColor,
+                                  ),
+                                ),
+                                const Spacer(),
+                                const Text(
+                                  'Orders',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: KColors.primaryColor,
+                                  ),
+                                ),
+                                const Spacer(),
+                              ],
+                            ),
+                          ),
+                          const VerticalDivider(color: KColors.primaryColor),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                const Spacer(),
+                                const Icon(
+                                  Icons.attach_money_outlined,
+                                  color: KColors.primaryColor,
+                                  size: 40,
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '\$${totalAmount.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: KColors.primaryColor,
+                                  ),
+                                ),
+                                const Spacer(),
+                                const Text(
+                                  'Total',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: KColors.primaryColor,
+                                  ),
+                                ),
+                                const Spacer(),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  )
-                  .toList(),
+
+                    // ✅ بقية الليست
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: ordersList.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: OrderItem(order: ordersList[index]),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ],

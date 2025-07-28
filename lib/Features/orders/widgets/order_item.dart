@@ -4,7 +4,7 @@ import 'package:e_commerce/core/constant/colors.dart';
 import 'package:flutter/material.dart';
 
 class OrderItem extends StatefulWidget {
-  final Order order;
+  final OrderModel order;
 
   const OrderItem({super.key, required this.order});
 
@@ -20,9 +20,7 @@ class _OrderItemState extends State<OrderItem> {
     return ExpansionPanelList(
       elevation: 4,
       expandedHeaderPadding: EdgeInsets.zero,
-      expansionCallback: (int index, bool isExpanded) {
-        // Handle expansion
-      },
+      expansionCallback: (int index, bool isExpanded) {},
       children: [
         ExpansionPanel(
           backgroundColor: Colors.grey[100],
@@ -33,7 +31,7 @@ class _OrderItemState extends State<OrderItem> {
                   isExpand = !isExpanded;
                 });
               },
-              title: Text('Order #${widget.order.orderId}'),
+              title: Text('Order #${widget.order.id}'),
               trailing: Container(
                 height: 25,
                 width: 65,
@@ -56,11 +54,16 @@ class _OrderItemState extends State<OrderItem> {
               ),
             );
           },
-          body: ListView(
+          body: ListView.builder(
             shrinkWrap: true,
-            physics: ClampingScrollPhysics(),
-            children: [ProductInOrder(), ProductInOrder(), ProductInOrder()],
+            physics: const ClampingScrollPhysics(),
+            itemCount: widget.order.orderItems.length,
+            itemBuilder: (context, index) {
+              final product = widget.order.orderItems[index];
+              return ProductInOrder(cartItem: product);
+            },
           ),
+
           isExpanded: isExpand,
         ),
       ],
