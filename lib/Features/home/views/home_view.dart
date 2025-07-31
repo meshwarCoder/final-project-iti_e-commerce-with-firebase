@@ -150,7 +150,7 @@ class HomeView extends StatelessWidget {
               title: 'Helps & Support',
               icon: Icons.support_agent,
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pushNamed(context, 'HelpSupportView');
               },
             ),
             const Spacer(),

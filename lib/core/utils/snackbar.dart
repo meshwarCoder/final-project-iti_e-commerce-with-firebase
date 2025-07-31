@@ -1,10 +1,8 @@
+import 'package:e_commerce/core/constant/colors.dart';
 import 'package:flutter/material.dart';
 
 void showSnackbar({required BuildContext context, required String message}) {
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      backgroundColor: Colors.white.withOpacity(0),
-      content: Text(message),
-    ),
+    SnackBar(backgroundColor: KColors.primaryColor, content: Text(message)),
   );
 }
