@@ -4,7 +4,7 @@ A new Flutter project.
 
 ## Getting Started
 
-## admin password id admin1234
+## admin password is admin123
 
 This project is a starting point for a Flutter application.
 

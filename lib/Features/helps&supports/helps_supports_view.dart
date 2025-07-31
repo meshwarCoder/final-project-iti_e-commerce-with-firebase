@@ -1,4 +1,3 @@
-import 'package:e_commerce/Features/home/firebase/home_services.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
@@ -106,7 +105,7 @@ class HelpSupportView extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SelectableText(
-                "Admin1234",
+                "Admin123",
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.red,

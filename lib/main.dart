@@ -5,7 +5,7 @@ import 'package:e_commerce/Features/auth/views/login_view.dart';
 import 'package:e_commerce/Features/auth/views/signup_view.dart';
 import 'package:e_commerce/Features/cart/cubit/cart_cubit.dart';
 import 'package:e_commerce/Features/cart/views/cart_view.dart';
-import 'package:e_commerce/Features/helps&supports/helps-supports_view.dart';
+import 'package:e_commerce/Features/helps&supports/helps_supports_view.dart';
 import 'package:e_commerce/Features/home/cubit/home_cubit.dart';
 import 'package:e_commerce/Features/home/views/home_view.dart';
 import 'package:e_commerce/Features/orders/views/order_view.dart';
