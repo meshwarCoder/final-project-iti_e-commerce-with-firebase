@@ -1,5 +1,4 @@
 import 'package:e_commerce/Features/auth/cubit/auth_cubit.dart';
-import 'package:e_commerce/Features/auth/widgets/button.dart';
 import 'package:e_commerce/Features/auth/widgets/custom_textfield.dart';
 import 'package:e_commerce/Features/home/cubit/home_cubit.dart';
 import 'package:e_commerce/core/services/firebase_sevices.dart';
@@ -10,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:e_commerce/core/widgets/custom_button.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -118,8 +118,22 @@ class LoginViewState extends State<LoginView> {
                             ),
                           ),
 
-                          SvgPicture.asset('assets/images/LOGO.svg'),
-                          SizedBox(height: 40),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              SvgPicture.asset('assets/images/LOGO.svg'),
+                              Text(
+                                'shopping with LOGO',
+                                style: GoogleFonts.roboto(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 30),
 
                           Text(
                             'Welcome Back!',
@@ -128,7 +142,7 @@ class LoginViewState extends State<LoginView> {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          SizedBox(height: 15),
+                          SizedBox(height: 12),
 
                           Text(
                             'Log in to existing LOGO account',
@@ -137,7 +151,7 @@ class LoginViewState extends State<LoginView> {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          SizedBox(height: 40),
+                          SizedBox(height: 24),
 
                           CustomTextfield(
                             validation: (value) =>
@@ -146,7 +160,7 @@ class LoginViewState extends State<LoginView> {
                             iconData: Icons.person,
                             controller: emailController,
                           ),
-                          SizedBox(height: 24),
+                          SizedBox(height: 20),
 
                           CustomTextfield(
                             obscureText: obscureText,
@@ -168,7 +182,6 @@ class LoginViewState extends State<LoginView> {
                             },
                             controller: passwordController,
                           ),
-                          SizedBox(height: 9),
 
                           Padding(
                             padding: const EdgeInsets.only(right: 40),
@@ -266,7 +279,7 @@ class LoginViewState extends State<LoginView> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 30),
+                          SizedBox(height: 25),
 
                           CustomButton(
                             name: 'LOGIN',
@@ -280,7 +293,7 @@ class LoginViewState extends State<LoginView> {
                               context.read<HomeCubit>().getHomeData();
                             },
                           ),
-                          SizedBox(height: 35),
+                          SizedBox(height: 30),
 
                           Text(
                             'Or Sign up using',
@@ -353,6 +366,7 @@ class LoginViewState extends State<LoginView> {
                               ],
                             ),
                           ),
+                          SizedBox(height: 20),
                         ],
                       ),
                     ),

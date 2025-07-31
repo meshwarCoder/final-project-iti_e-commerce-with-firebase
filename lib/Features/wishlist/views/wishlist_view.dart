@@ -1,5 +1,9 @@
+import 'package:e_commerce/Features/cart/models/cart_model.dart';
+import 'package:e_commerce/Features/home/models/product_model.dart';
 import 'package:e_commerce/Features/home/widgets/verticalgrid_list.dart';
+import 'package:e_commerce/Features/wishlist/firebase/wishlist_services.dart';
 import 'package:e_commerce/core/constant/colors.dart';
+import 'package:e_commerce/core/services/firebase_sevices.dart';
 import 'package:e_commerce/core/widgets/Custom_appbar.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +17,7 @@ class WishlistView extends StatelessWidget {
         title: 'My Wishlist',
         actions: [
           PopupMenuButton<int>(
-            onSelected: (value) {
+            onSelected: (value) async {
               if (value == 0) {
                 showDialog(
                   context: context,
@@ -37,7 +41,16 @@ class WishlistView extends StatelessWidget {
                           ),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            final wishlistItems =
+                                await WishlistServices.getWishlist().first;
+                            for (var item in wishlistItems) {
+                              await WishlistServices.removeFromWishlist(
+                                item.id,
+                              );
+                            }
+                            Navigator.pop(context);
+                          },
                           child: const Text(
                             'Clear',
                             style: TextStyle(color: Colors.red),
@@ -48,6 +61,7 @@ class WishlistView extends StatelessWidget {
                   },
                 );
               }
+
               if (value == 1) {
                 showDialog(
                   context: context,
@@ -71,7 +85,23 @@ class WishlistView extends StatelessWidget {
                           ),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            final wishlistItems =
+                                await WishlistServices.getWishlist().first;
+                            for (var item in wishlistItems) {
+                              await FirebaseServices.addToCart(
+                                userId: FirebaseServices.getCurrentUser()!.uid,
+                                item: CartItemModel(
+                                  productId: item.id,
+                                  title: item.title,
+                                  price: item.price,
+                                  imageUrl: item.imageUrl,
+                                  quantity: 1,
+                                ),
+                              );
+                            }
+                            Navigator.pop(context);
+                          },
                           child: const Text(
                             'Add',
                             style: TextStyle(color: Colors.green),
@@ -110,67 +140,144 @@ class WishlistView extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.all(12),
-              height: 100,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-
-                borderRadius: BorderRadius.circular(12),
-                // color: Colors.grey[300],
-              ),
-              child: Row(
-                children: [
-                  SizedBox(width: 10),
-                  Icon(Icons.favorite, color: KColors.primaryColor, size: 25),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '2 items in your wishlist',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: StreamBuilder<List<ProductModel>>(
+            stream: WishlistServices.getWishlist(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasData) {
+                return Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.all(12),
+                      height: 100,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 10),
+                          Icon(
+                            Icons.favorite,
                             color: KColors.primaryColor,
+                            size: 25,
                           ),
-                        ),
-                        Text(
-                          'Add items to your wishlist and they will appear here',
-                          style: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 11,
-                            color: KColors.primaryColor.withOpacity(.5),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${snapshot.data!.length} items in your wishlist',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color: KColors.primaryColor,
+                                  ),
+                                ),
+                                Text(
+                                  'Add items to your wishlist and they will appear here',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 11,
+                                    color: KColors.primaryColor.withOpacity(.5),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: () {
+                              for (var _ in snapshot.data!) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      backgroundColor: const Color(0xFF2B3840),
+                                      title: const Text(
+                                        'Add Wishlist To Cart',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      content: const Text(
+                                        'Are you sure you want to add all wishlist to cart?',
+                                        style: TextStyle(color: Colors.white70),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            final wishlistItems =
+                                                await WishlistServices.getWishlist()
+                                                    .first;
+                                            for (var item in wishlistItems) {
+                                              await FirebaseServices.addToCart(
+                                                userId:
+                                                    FirebaseServices.getCurrentUser()!
+                                                        .uid,
+                                                item: CartItemModel(
+                                                  productId: item.id,
+                                                  title: item.title,
+                                                  price: item.price,
+                                                  imageUrl: item.imageUrl,
+                                                  quantity: 1,
+                                                ),
+                                              );
+                                            }
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(
+                                            'Add',
+                                            style: TextStyle(
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: KColors.primaryColor,
+                            ),
+                            child: Text(
+                              'Add to cart',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: KColors.primaryColor,
-                    ),
-                    child: Text(
-                      'Add to cart',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              // child: VerticalGridList(p),
-            ),
-          ],
+                    VerticalGridList(products: snapshot.data!),
+                  ],
+                );
+              } else if (snapshot.hasError) {
+                return throw Exception(
+                  'Error loading wishlist\n${snapshot.error}',
+                );
+              } else {
+                return const Center(child: Text('No items in wishlist'));
+              }
+            },
+          ),
         ),
       ),
     );

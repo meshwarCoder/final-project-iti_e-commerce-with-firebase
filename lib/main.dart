@@ -1,3 +1,6 @@
+import 'package:e_commerce/Features/admin/views/addedit_categorey.dart';
+import 'package:e_commerce/Features/admin/views/addedit_product_view.dart';
+import 'package:e_commerce/Features/admin/views/admin_view.dart';
 import 'package:e_commerce/Features/auth/views/login_view.dart';
 import 'package:e_commerce/Features/auth/views/signup_view.dart';
 import 'package:e_commerce/Features/cart/cubit/cart_cubit.dart';
@@ -42,6 +45,9 @@ class MyApp extends StatelessWidget {
           'OrderView': (context) => OrderView(),
           'ProfileView': (context) => ProfileView(),
           'WishlistView': (context) => WishlistView(),
+          'AdminView': (context) => AdminView(),
+          'AddEditCategoryView': (context) => AddEditCategoryView(),
+          'AddEditProductView': (context) => AddEditProductView(),
         },
       ),
     );

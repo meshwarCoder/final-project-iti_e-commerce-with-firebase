@@ -1,12 +1,13 @@
 import 'package:e_commerce/Features/auth/cubit/auth_cubit.dart';
-import 'package:e_commerce/Features/auth/widgets/button.dart';
 import 'package:e_commerce/Features/auth/widgets/custom_textfield.dart';
 import 'package:e_commerce/core/utils/snackbar.dart';
 import 'package:e_commerce/core/utils/vlidation.dart';
+import 'package:e_commerce/core/widgets/Custom_appbar.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:e_commerce/core/widgets/custom_button.dart';
 
 class SignupView extends StatefulWidget {
   const SignupView({super.key});
@@ -36,7 +37,6 @@ class _SignupViewState extends State<SignupView> {
   bool obscureTextconfirmPass = true;
   bool obscureTextAdminPass = true;
 
-  // كلمة مرور الأدمن المطلوبة
   final String requiredAdminPassword = "admin123";
 
   @override
@@ -54,6 +54,7 @@ class _SignupViewState extends State<SignupView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(title: "Sign Up", actions: []),
       backgroundColor: Colors.white,
       body: Center(
         child: Form(
@@ -77,7 +78,6 @@ class _SignupViewState extends State<SignupView> {
                         absorbing: state is AuthLoading,
                         child: Column(
                           children: [
-                            SizedBox(height: 100),
                             Text(
                               'Let’s Get Started!',
                               style: GoogleFonts.roboto(
@@ -86,17 +86,17 @@ class _SignupViewState extends State<SignupView> {
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(height: 9),
+                            SizedBox(height: 7),
 
                             Text(
-                              'Create an account on MNZL to get all features',
+                              'Create an account to shop with LOGO',
                               style: GoogleFonts.roboto(
                                 color: Color.fromRGBO(81, 81, 81, 1),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                            SizedBox(height: 34),
+                            SizedBox(height: 25),
                             CustomTextfield(
                               hintText: 'Full Name',
                               iconData: Icons.person,
@@ -104,7 +104,7 @@ class _SignupViewState extends State<SignupView> {
                               validation: (value) =>
                                   Validation.validateName(value),
                             ),
-                            SizedBox(height: 25),
+                            SizedBox(height: 18),
                             CustomTextfield(
                               hintText: 'Email',
                               iconData: Icons.email,
@@ -112,7 +112,7 @@ class _SignupViewState extends State<SignupView> {
                               validation: (value) =>
                                   Validation.validateEmail(value),
                             ),
-                            SizedBox(height: 25),
+                            SizedBox(height: 18),
                             CustomTextfield(
                               hintText: 'Phone Number',
                               iconData: Icons.phone,
@@ -120,7 +120,7 @@ class _SignupViewState extends State<SignupView> {
                               validation: (value) =>
                                   Validation.validatePhone(value),
                             ),
-                            SizedBox(height: 25),
+                            SizedBox(height: 18),
                             CustomTextfield(
                               hintText: 'Address',
                               iconData: Icons.location_on,
@@ -128,7 +128,7 @@ class _SignupViewState extends State<SignupView> {
                               validation: (value) =>
                                   Validation.validateAddress(value),
                             ),
-                            SizedBox(height: 25),
+                            SizedBox(height: 18),
                             CustomTextfield(
                               obscureText: obscureTextpass,
                               hintText: 'Password',
@@ -148,7 +148,7 @@ class _SignupViewState extends State<SignupView> {
                               validation: (value) =>
                                   Validation.validatePassword(value),
                             ),
-                            SizedBox(height: 25),
+                            SizedBox(height: 18),
                             CustomTextfield(
                               obscureText: obscureTextconfirmPass,
                               hintText: 'Confirm Password',
@@ -172,7 +172,7 @@ class _SignupViewState extends State<SignupView> {
                                     passwordController.text,
                                   ),
                             ),
-                            SizedBox(height: 25),
+                            SizedBox(height: 18),
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 30,
@@ -245,7 +245,7 @@ class _SignupViewState extends State<SignupView> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 25),
+                            SizedBox(height: 18),
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 30,
@@ -319,9 +319,8 @@ class _SignupViewState extends State<SignupView> {
                               ),
                             ),
 
-                            // حقل كلمة مرور الأدمن يظهر فقط عند اختيار Admin
                             if (isAdmin == true) ...[
-                              SizedBox(height: 25),
+                              SizedBox(height: 18),
                               CustomTextfield(
                                 obscureText: obscureTextAdminPass,
                                 hintText: 'Admin Password',
@@ -379,7 +378,7 @@ class _SignupViewState extends State<SignupView> {
                                 }
                               },
                             ),
-                            SizedBox(height: 45),
+                            SizedBox(height: 30),
                             RichText(
                               text: TextSpan(
                                 children: [
@@ -407,7 +406,7 @@ class _SignupViewState extends State<SignupView> {
                                 ],
                               ),
                             ),
-                            SizedBox(height: 25),
+                            SizedBox(height: 30),
                           ],
                         ),
                       ),

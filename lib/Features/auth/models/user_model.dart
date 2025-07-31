@@ -22,7 +22,7 @@ class UserModel {
   });
 
   // Factory constructor to create UserModel from Firestore data
-  factory UserModel.fromMap(Map<String, dynamic> map, String uid) {
+  factory UserModel.fromFirestore(Map<String, dynamic> map, String uid) {
     return UserModel(
       uid: uid,
       fullName: map['fullName'] ?? '',
@@ -37,7 +37,7 @@ class UserModel {
   }
 
   // Convert UserModel to Map for Firestore
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toFirestore() {
     return {
       'uid': uid,
       'fullName': fullName,

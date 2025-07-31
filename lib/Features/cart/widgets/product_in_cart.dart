@@ -98,8 +98,8 @@ class ProductCounter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 40,
-      width: 120,
+      height: 35,
+      width: 90,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(5),
@@ -107,24 +107,24 @@ class ProductCounter extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          IconButton(
-            onPressed: () async {
+          InkWell(
+            onTap: () async {
               await FirebaseServices.decrementCartItemQuantity(
                 FirebaseAuth.instance.currentUser!.uid,
                 cartItem.productId,
               );
             },
-            icon: const Icon(Icons.remove),
+            child: const Icon(Icons.remove, size: 16),
           ),
-          Text(cartItem.quantity.toString()),
-          IconButton(
-            onPressed: () async {
+          Text(cartItem.quantity.toString(), style: TextStyle(fontSize: 14)),
+          InkWell(
+            onTap: () async {
               await FirebaseServices.incrementCartItemQuantity(
                 FirebaseAuth.instance.currentUser!.uid,
                 cartItem.productId,
               );
             },
-            icon: const Icon(Icons.add),
+            child: const Icon(Icons.add, size: 16),
           ),
         ],
       ),

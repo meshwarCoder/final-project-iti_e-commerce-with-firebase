@@ -10,7 +10,7 @@ class OrderCubit extends Cubit<OrderState> {
   Future<void> getOrders() async {
     try {
       emit(OrderLoading());
-      final orders = await FirebaseServices.getUserOrders(
+      final orders = FirebaseServices.getUserOrders(
         FirebaseAuth.instance.currentUser!.uid,
       );
       // emit(OrderSuccess(orders: orders));

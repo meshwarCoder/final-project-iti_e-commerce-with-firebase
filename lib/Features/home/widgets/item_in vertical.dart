@@ -1,25 +1,27 @@
+import 'package:e_commerce/Features/cart/firebase/cart_services.dart';
 import 'package:e_commerce/Features/cart/models/cart_model.dart';
 import 'package:e_commerce/Features/home/models/product_model.dart';
+import 'package:e_commerce/Features/home/views/product_details.dart';
+import 'package:e_commerce/Features/wishlist/firebase/wishlist_services.dart';
 import 'package:e_commerce/core/services/firebase_sevices.dart';
 import 'package:flutter/material.dart';
 
-class ItemInVertical extends StatefulWidget {
+class ItemInVertical extends StatelessWidget {
   final ProductModel product;
 
   const ItemInVertical({super.key, required this.product});
 
   @override
-  State<ItemInVertical> createState() => _ItemInVerticalState();
-}
-
-class _ItemInVerticalState extends State<ItemInVertical> {
-  bool isWishlisted = false;
-  bool isCarted = false;
-
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsView(product: product),
+          ),
+        );
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Stack(
@@ -40,7 +42,7 @@ class _ItemInVerticalState extends State<ItemInVertical> {
                       height: 160,
                       width: double.infinity,
                       child: Image.network(
-                        widget.product.imageUrl,
+                        product.imageUrl,
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
@@ -67,7 +69,7 @@ class _ItemInVerticalState extends State<ItemInVertical> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.product.title,
+                          product.title,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -78,7 +80,7 @@ class _ItemInVerticalState extends State<ItemInVertical> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          widget.product.description,
+                          product.description,
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey[600],
@@ -92,51 +94,74 @@ class _ItemInVerticalState extends State<ItemInVertical> {
                 ],
               ),
             ),
+
+            // زر الـ Wishlist
             Positioned(
-              top: 8,
-              right: 8,
-              child: CircleAvatar(
-                backgroundColor: Colors.white.withOpacity(0.2),
-                radius: 20,
-                child: Center(
-                  child: IconButton(
-                    icon: Icon(
-                      isWishlisted ? Icons.favorite : Icons.favorite_border,
-                      color: isWishlisted ? Colors.red : Colors.grey,
+              top: 5,
+              right: 5,
+              child: StreamBuilder<bool>(
+                stream: WishlistServices.isInWishlistStream(product.id),
+                builder: (context, snapshot) {
+                  final isWishlisted = snapshot.data ?? false;
+                  return CircleAvatar(
+                    backgroundColor: Colors.white.withOpacity(0.2),
+                    radius: 20,
+                    child: IconButton(
+                      icon: Icon(
+                        isWishlisted ? Icons.favorite : Icons.favorite_border,
+                        color: isWishlisted ? Colors.red : Colors.grey,
+                      ),
+                      onPressed: () {
+                        if (isWishlisted) {
+                          WishlistServices.removeFromWishlist(product.id);
+                        } else {
+                          WishlistServices.addToWishlist(product);
+                        }
+                      },
                     ),
-                    onPressed: () {
-                      setState(() {
-                        isWishlisted = !isWishlisted;
-                      });
-                    },
-                  ),
-                ),
+                  );
+                },
               ),
             ),
+
+            // زر الكارت
             Positioned(
-              bottom: 8,
-              right: 8,
-              child: IconButton(
-                icon: Icon(
-                  isCarted ? Icons.check : Icons.add_shopping_cart,
-                  color: isCarted ? Colors.green : Colors.grey,
-                ),
-                onPressed: () {
-                  if (!isCarted) {
-                    FirebaseServices.addToCart(
-                      userId: FirebaseServices.getCurrentUser()!.uid,
-                      item: CartItemModel(
-                        productId: widget.product.id.toString(),
-                        title: widget.product.title,
-                        imageUrl: widget.product.imageUrl,
-                        price: widget.product.price,
-                        quantity: 1,
-                      ),
-                    );
-                  }
-                  setState(() {
-                    isCarted = !isCarted;
-                  });
+              bottom: 0,
+              right: 5,
+              child: StreamBuilder(
+                stream: CartServices.isInCart(product.id),
+                builder: (context, snapshot) {
+                  final isInCart = snapshot.data ?? false;
+                  return IconButton(
+                    icon: Icon(
+                      isInCart ? Icons.check : Icons.add_shopping_cart,
+                      color: isInCart ? Colors.green : Colors.grey,
+                    ),
+                    onPressed: () {
+                      if (isInCart) {
+                        CartServices.addOrRemoveFromCart(
+                          CartItemModel(
+                            productId: product.id.toString(),
+                            title: product.title,
+                            imageUrl: product.imageUrl,
+                            price: product.price,
+                            quantity: 1,
+                          ),
+                        );
+                      } else {
+                        FirebaseServices.addToCart(
+                          userId: FirebaseServices.getCurrentUser()!.uid,
+                          item: CartItemModel(
+                            productId: product.id.toString(),
+                            title: product.title,
+                            imageUrl: product.imageUrl,
+                            price: product.price,
+                            quantity: 1,
+                          ),
+                        );
+                      }
+                    },
+                  );
                 },
               ),
             ),

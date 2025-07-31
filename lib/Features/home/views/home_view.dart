@@ -1,10 +1,14 @@
 import 'package:e_commerce/Features/auth/views/login_view.dart';
 import 'package:e_commerce/Features/cart/cubit/cart_cubit.dart';
-import 'package:e_commerce/Features/home/cubit/home_cubit.dart';
-import 'package:e_commerce/Features/home/cubit/home_state.dart';
+import 'package:e_commerce/Features/home/firebase/home_services.dart';
+import 'package:e_commerce/Features/home/models/category_model.dart';
+import 'package:e_commerce/Features/home/views/categoryproduct_view.dart';
+import 'package:e_commerce/Features/home/widgets/Product_search.dart';
+import 'package:e_commerce/Features/home/widgets/categories_list.dart';
 import 'package:e_commerce/Features/home/widgets/custom_listtile.dart';
 import 'package:e_commerce/Features/home/widgets/horizontal_list.dart';
 import 'package:e_commerce/Features/home/widgets/verticalgrid_list.dart';
+import 'package:e_commerce/core/constant/colors.dart';
 import 'package:e_commerce/core/services/firebase_sevices.dart';
 import 'package:e_commerce/core/widgets/Custom_appbar.dart';
 import 'package:flutter/material.dart';
@@ -19,9 +23,19 @@ class HomeView extends StatelessWidget {
       appBar: CustomAppBar(
         title: 'Home',
         actions: [
-          IconButton(icon: Icon(Icons.search), onPressed: () {}),
           IconButton(
-            icon: Icon(Icons.shopping_cart_outlined),
+            icon: const Icon(Icons.search),
+            onPressed: () async {
+              final productsStream = HomeServices.getAllProducts();
+              final products = await productsStream.first;
+              showSearch(
+                context: context,
+                delegate: ProductSearchDelegate(products),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.shopping_cart_outlined),
             onPressed: () {
               context.read<CartCubit>().getCartItems();
               Navigator.pushNamed(context, 'CartView');
@@ -30,29 +44,55 @@ class HomeView extends StatelessWidget {
         ],
       ),
       drawer: Drawer(
-        backgroundColor: const Color(0xFF2B3840),
+        backgroundColor: KColors.primaryColor,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DrawerHeader(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const CircleAvatar(radius: 30),
-                  const SizedBox(height: 10),
-                  Text(
-                    'User Name',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    'dhuid@user.com',
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
-                ],
+              child: FutureBuilder(
+                future: HomeServices.getCurrentUserData(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError || !snapshot.hasData) {
+                    throw Exception("Error loading user\n${snapshot.error}");
+                  }
+
+                  final user = snapshot.data!;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        child: Text(
+                          user.fullName.isNotEmpty ? user.fullName[0] : "?",
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        user.fullName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        user.email,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             CustomListTile(
@@ -83,8 +123,22 @@ class HomeView extends StatelessWidget {
                 Navigator.pushNamed(context, 'WishlistView');
               },
             ),
+            FutureBuilder<bool>(
+              future: FirebaseServices.isCurrentUserAdmin(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data == true) {
+                  return CustomListTile(
+                    title: 'Admin Page',
+                    icon: Icons.admin_panel_settings,
+                    onTap: () {
+                      Navigator.pushNamed(context, 'AdminView');
+                    },
+                  );
+                }
+                return const SizedBox();
+              },
+            ),
             const Divider(color: Colors.white24),
-
             CustomListTile(
               title: 'Profile',
               icon: Icons.person,
@@ -99,8 +153,8 @@ class HomeView extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
-            Spacer(),
-            Divider(color: Colors.white24),
+            const Spacer(),
+            const Divider(color: Colors.white24),
             CustomListTile(
               title: 'Logout',
               icon: Icons.logout,
@@ -130,11 +184,12 @@ class HomeView extends StatelessWidget {
                         TextButton(
                           onPressed: () {
                             FirebaseServices.signOut();
-                            Navigator.pushReplacement(
+                            Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => LoginView(),
+                                builder: (context) => const LoginView(),
                               ),
+                              (route) => false,
                             );
                           },
                           child: const Text(
@@ -148,32 +203,95 @@ class HomeView extends StatelessWidget {
                 );
               },
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
           ],
         ),
       ),
       body: SingleChildScrollView(
-        child: BlocConsumer<HomeCubit, HomeState>(
-          listener: (context, state) {},
-          builder: (context, state) {
-            if (state is HomeLoadingState) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is HomeSuccessState) {
-              return Column(
-                children: [
-                  HorizontalList(products: state.products),
-                  SizedBox(height: 15),
-                  VerticalGridList(
-                    products: context.read<HomeCubit>().products,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            const Padding(
+              padding: EdgeInsets.only(left: 16.0),
+              child: Text(
+                'Shopping by Category',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 5),
+            StreamBuilder<List<CategoryModel>>(
+              stream: HomeServices.getCategories(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text("Error loading categories\n${snapshot.error}"),
+                  );
+                }
+                final categories = snapshot.data ?? [];
+                return Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: CategoryList(
+                    categories: categories,
+                    onCategorySelected: (category) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              CategoryProductsView(category: category),
+                        ),
+                      );
+                    },
                   ),
-                ],
-              );
-            } else if (state is HomeErrorState) {
-              return Center(child: Text(state.toString()));
-            } else {
-              return const Center(child: Text('Something went wrong'));
-            }
-          },
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.only(left: 16.0),
+              child: Text(
+                'Featured Products',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 5),
+            StreamBuilder(
+              stream: HomeServices.getAllProducts(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text("Error loading products\n${snapshot.error}"),
+                  );
+                }
+                final products = snapshot.data ?? [];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    HorizontalList(products: products),
+                    const SizedBox(height: 15),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        'New Arrivals',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    VerticalGridList(products: products),
+                  ],
+                );
+              },
+            ),
+          ],
         ),
       ),
     );

@@ -60,13 +60,15 @@ class _SplashViewState extends State<SplashView> {
             ],
           ),
           Transform.translate(
-            offset: Offset(10, -50),
-            child: Image.asset("assets/images/image.png"),
+            offset: Offset(10, -10),
+            child: SvgPicture.asset("assets/images/splash.svg", height: 400),
           ),
+          const SizedBox(height: 30),
           Transform.translate(
             offset: Offset(0, -50),
+
             child: Text(
-              "LOREM IPSUM",
+              "shopping with LOGO",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
@@ -74,14 +76,14 @@ class _SplashViewState extends State<SplashView> {
               ),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           Transform.translate(
             offset: Offset(0, -50),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Lorem Ipsum is a dummy text\n        used as placeholder",
+                  "LOGO makes shopping easy\n and fun!",
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 20,

@@ -1,4 +1,6 @@
+import 'package:e_commerce/Features/orders/firebase/order_services.dart';
 import 'package:e_commerce/Features/orders/models/order_model.dart';
+import 'package:e_commerce/Features/orders/views/emptyorder_view.dart';
 import 'package:e_commerce/Features/orders/widgets/order_item.dart';
 import 'package:e_commerce/core/constant/colors.dart';
 import 'package:e_commerce/core/services/firebase_sevices.dart';
@@ -40,7 +42,12 @@ class OrderView extends StatelessWidget {
                           ),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            OrderServices.clearOrders(
+                              FirebaseAuth.instance.currentUser!.uid,
+                            );
+                            Navigator.pop(context);
+                          },
                           child: const Text(
                             'Clear',
                             style: TextStyle(color: Colors.red),
@@ -79,7 +86,7 @@ class OrderView extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No Orders Found'));
+                  return const Center(child: EmptyOrdersScreen());
                 }
 
                 final ordersList = snapshot.data!;

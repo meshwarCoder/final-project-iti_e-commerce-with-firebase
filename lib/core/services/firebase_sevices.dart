@@ -143,7 +143,7 @@ class FirebaseServices {
     await _firestore
         .collection(_usersCollection)
         .doc(user.uid)
-        .set(user.toMap());
+        .set(user.toFirestore());
   }
 
   static Future<bool> checkUserExists(String email) async {
@@ -164,12 +164,17 @@ class FirebaseServices {
   }
 
   Future<void> addProduct(ProductModel product) async {
-    // Call the user's CollectionReference to add a new user
-    await _firestore
-        .collection(_productsCollection)
-        .add(product.toFirestore())
-        .then((value) => print("User Added"))
-        .catchError((error) => print("Failed to add user: $error"));
+    try {
+      final docRef = _firestore
+          .collection(_productsCollection)
+          .doc(); // توليد doc.id
+      product.id = docRef.id; // تعيين الـ id جوه المنتج
+
+      await docRef.set(product.toFirestore()); // تخزين المنتج بالـ id
+      throw Exception('Failed to add product');
+    } catch (error) {
+      throw Exception('Failed to add product: $error');
+    }
   }
 
   static Future<List<ProductModel>> getAllProducts() async {
@@ -180,7 +185,7 @@ class FirebaseServices {
       List<ProductModel> products = [];
       for (var doc in querySnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        products.add(ProductModel.fromFirestore(data));
+        products.add(ProductModel.fromFirestore(data, doc.id));
       }
       return products;
     } catch (e) {
@@ -207,7 +212,7 @@ class FirebaseServices {
       final currentQty = doc['quantity'];
       await docRef.update({'quantity': currentQty + 1});
     } else {
-      await docRef.set(item.toFirestore()); // استخدم set بدل add
+      await docRef.set(item.toFirestore());
     }
   }
 
@@ -232,7 +237,6 @@ class FirebaseServices {
         .doc(userId)
         .collection('cart');
 
-    // البحث عن المستند الذي يحتوي على productId المطلوب
     final querySnapshot = await cartRef
         .where('productId', isEqualTo: productId)
         .get();
@@ -252,7 +256,6 @@ class FirebaseServices {
         .doc(userId)
         .collection('cart');
 
-    // البحث عن المستند الذي يحتوي على productId المطلوب
     final querySnapshot = await cartRef
         .where('productId', isEqualTo: productId)
         .get();
@@ -264,7 +267,6 @@ class FirebaseServices {
       if (currentQty > 1) {
         await cartRef.doc(docId).update({'quantity': FieldValue.increment(-1)});
       } else {
-        // حذف المنتج من السلة إذا أصبحت الكمية 0
         await cartRef.doc(docId).delete();
       }
     }
@@ -297,16 +299,12 @@ class FirebaseServices {
     final ordersRef = userDoc.collection('orders');
     final cartRef = userDoc.collection('cart');
 
-    // 1. جلب كل العناصر من الكارت
     final cartSnapshot = await cartRef.get();
 
-    // 2. لو الكارت فاضي متعملش أوردر
     if (cartSnapshot.docs.isEmpty) return;
 
-    // 4. رفع الأوردر
     await ordersRef.add(order.toFirestore());
 
-    // 5. مسح الكارت بعد نجاح الأوردر
     for (final doc in cartSnapshot.docs) {
       await doc.reference.delete();
     }
@@ -324,5 +322,17 @@ class FirebaseServices {
             return OrderModel.fromFirestore(doc.data());
           }).toList();
         });
+  }
+
+  static Future<bool> isCurrentUserAdmin() async {
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+
+    if (userDoc.exists) {
+      return userDoc.data()?['isAdmin'] ?? false;
+    }
+    return false;
   }
 }

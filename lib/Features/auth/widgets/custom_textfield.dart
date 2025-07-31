@@ -8,31 +8,42 @@ class CustomTextfield extends StatelessWidget {
     required this.controller,
     required this.validation,
     required this.hintText,
+    this.fillColor = const Color.fromRGBO(242, 242, 242, 1),
     this.iconPath,
     this.iconData,
     this.obscureText = false,
     this.suffixIcon,
+    this.keyboardType,
+    this.readOnly = false,
   });
 
   final String? Function(String?)? validation;
   final String hintText;
   final String? iconPath;
   final IconData? iconData;
+  final Color? fillColor;
   final bool obscureText;
+  final TextInputType? keyboardType;
   final TextEditingController controller;
   final IconButton? suffixIcon;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: TextFormField(
+        readOnly: readOnly,
+        keyboardType: keyboardType,
         obscureText: obscureText,
         controller: controller,
         validator: validation,
         decoration: InputDecoration(
-          suffixIcon: suffixIcon,
           border: OutlineInputBorder(borderSide: BorderSide.none),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+          ),
+          suffixIcon: suffixIcon,
           prefixIcon: Padding(
             padding: const EdgeInsets.only(left: 30, right: 20),
             child: iconPath != null
@@ -45,7 +56,7 @@ class CustomTextfield extends StatelessWidget {
             fontSize: 14,
           ),
           filled: true,
-          fillColor: Color.fromRGBO(242, 242, 242, 1),
+          fillColor: fillColor,
           contentPadding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         ),
       ),
