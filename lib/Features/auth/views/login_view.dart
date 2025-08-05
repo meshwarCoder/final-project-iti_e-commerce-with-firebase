@@ -24,6 +24,7 @@ class LoginViewState extends State<LoginView> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool obscureText = true;
+  bool autoValidate = false;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +32,9 @@ class LoginViewState extends State<LoginView> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Form(
+          autovalidateMode: autoValidate
+              ? AutovalidateMode.always
+              : AutovalidateMode.disabled,
           key: formKey,
           child: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
@@ -284,6 +288,9 @@ class LoginViewState extends State<LoginView> {
                           CustomButton(
                             name: 'LOGIN',
                             onPressed: () async {
+                              setState(() {
+                                autoValidate = true;
+                              });
                               if (formKey.currentState!.validate()) {
                                 await context.read<AuthCubit>().loginUser(
                                   email: emailController.text,

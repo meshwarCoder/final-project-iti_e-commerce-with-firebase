@@ -71,17 +71,19 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> loginWithGoogle() async {
     try {
       emit(AuthLoading());
-      await FirebaseServices.signInWithGoogle();
-      final userExists = await FirebaseServices.checkUserExists(
-        _firebaseAuth.currentUser!.email!,
-      );
+      final user = await FirebaseServices.signInWithGoogle();
+      if (user == null) {
+        emit(AuthError('Google Sign-In was cancelled.'));
+        return;
+      }
+      final userExists = await FirebaseServices.checkUserExists(user.email!);
       if (!userExists) {
         await FirebaseServices.createUserInFirestore(
           UserModel(
-            uid: _firebaseAuth.currentUser!.uid,
-            fullName: _firebaseAuth.currentUser!.displayName!,
-            email: _firebaseAuth.currentUser!.email!,
-            phoneNumber: _firebaseAuth.currentUser?.phoneNumber ?? '',
+            uid: user.uid,
+            fullName: user.displayName!,
+            email: user.email!,
+            phoneNumber: user.phoneNumber ?? '',
             address: 'unKnown',
             password: '000000',
             gender: 'unknown',

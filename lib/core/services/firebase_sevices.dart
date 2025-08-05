@@ -126,8 +126,8 @@ class FirebaseServices {
   }
 
   static Future<void> signOut() async {
-    await disconnectWithGoogle();
     await _auth.signOut();
+    await _googleSignIn.signOut();
   }
 
   static bool isLoggedIn() {

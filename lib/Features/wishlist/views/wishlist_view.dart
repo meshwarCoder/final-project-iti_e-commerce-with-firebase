@@ -4,6 +4,7 @@ import 'package:e_commerce/Features/home/widgets/verticalgrid_list.dart';
 import 'package:e_commerce/Features/wishlist/firebase/wishlist_services.dart';
 import 'package:e_commerce/core/constant/colors.dart';
 import 'package:e_commerce/core/services/firebase_sevices.dart';
+import 'package:e_commerce/core/utils/snackbar.dart';
 import 'package:e_commerce/core/widgets/Custom_appbar.dart';
 import 'package:flutter/material.dart';
 
@@ -101,6 +102,10 @@ class WishlistView extends StatelessWidget {
                               );
                             }
                             Navigator.pop(context);
+                            showSnackbar(
+                              context: context,
+                              message: 'Added to cart successfully',
+                            );
                           },
                           child: const Text(
                             'Add',
@@ -195,64 +200,62 @@ class WishlistView extends StatelessWidget {
                           SizedBox(width: 10),
                           ElevatedButton(
                             onPressed: () {
-                              for (var _ in snapshot.data!) {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      backgroundColor: const Color(0xFF2B3840),
-                                      title: const Text(
-                                        'Add Wishlist To Cart',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      content: const Text(
-                                        'Are you sure you want to add all wishlist to cart?',
-                                        style: TextStyle(color: Colors.white70),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: const Text(
-                                            'Cancel',
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                            ),
-                                          ),
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: const Color(0xFF2B3840),
+                                    title: const Text(
+                                      'Add Wishlist To Cart',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    content: const Text(
+                                      'Are you sure you want to add all wishlist to cart?',
+                                      style: TextStyle(color: Colors.white70),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text(
+                                          'Cancel',
+                                          style: TextStyle(color: Colors.grey),
                                         ),
-                                        TextButton(
-                                          onPressed: () async {
-                                            final wishlistItems =
-                                                await WishlistServices.getWishlist()
-                                                    .first;
-                                            for (var item in wishlistItems) {
-                                              await FirebaseServices.addToCart(
-                                                userId:
-                                                    FirebaseServices.getCurrentUser()!
-                                                        .uid,
-                                                item: CartItemModel(
-                                                  productId: item.id,
-                                                  title: item.title,
-                                                  price: item.price,
-                                                  imageUrl: item.imageUrl,
-                                                  quantity: 1,
-                                                ),
-                                              );
-                                            }
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text(
-                                            'Add',
-                                            style: TextStyle(
-                                              color: Colors.green,
-                                            ),
-                                          ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          final wishlistItems =
+                                              await WishlistServices.getWishlist()
+                                                  .first;
+                                          for (var item in wishlistItems) {
+                                            await FirebaseServices.addToCart(
+                                              userId:
+                                                  FirebaseServices.getCurrentUser()!
+                                                      .uid,
+                                              item: CartItemModel(
+                                                productId: item.id,
+                                                title: item.title,
+                                                price: item.price,
+                                                imageUrl: item.imageUrl,
+                                                quantity: 1,
+                                              ),
+                                            );
+                                          }
+                                          Navigator.pop(context);
+                                          showSnackbar(
+                                            context: context,
+                                            message:
+                                                'Added to cart successfully',
+                                          );
+                                        },
+                                        child: const Text(
+                                          'Add',
+                                          style: TextStyle(color: Colors.green),
                                         ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              }
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: KColors.primaryColor,

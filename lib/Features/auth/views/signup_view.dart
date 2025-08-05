@@ -36,6 +36,7 @@ class _SignupViewState extends State<SignupView> {
   bool obscureTextpass = true;
   bool obscureTextconfirmPass = true;
   bool obscureTextAdminPass = true;
+  bool autoValidate = false;
 
   final String requiredAdminPassword = "admin123";
 
@@ -58,6 +59,9 @@ class _SignupViewState extends State<SignupView> {
       backgroundColor: Colors.white,
       body: Center(
         child: Form(
+          autovalidateMode: autoValidate
+              ? AutovalidateMode.onUserInteraction
+              : AutovalidateMode.disabled,
           key: formKey,
           child: SingleChildScrollView(
             child: BlocConsumer<AuthCubit, AuthState>(
@@ -356,6 +360,9 @@ class _SignupViewState extends State<SignupView> {
                             CustomButton(
                               name: 'CREATE',
                               onPressed: () {
+                                setState(() {
+                                  autoValidate = true;
+                                });
                                 if (formKey.currentState!.validate() &&
                                     selectedGender != null &&
                                     isAdmin != null) {

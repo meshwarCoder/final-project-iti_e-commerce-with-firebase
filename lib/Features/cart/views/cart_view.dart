@@ -193,7 +193,7 @@ class CartView extends StatelessWidget {
                                     },
                                     child: const Text(
                                       'Checkout',
-                                      style: TextStyle(color: Colors.red),
+                                      style: TextStyle(color: Colors.green),
                                     ),
                                   ),
                                 ],

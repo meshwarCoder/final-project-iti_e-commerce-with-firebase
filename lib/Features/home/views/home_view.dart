@@ -14,9 +14,14 @@ import 'package:e_commerce/core/widgets/Custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,7 +148,9 @@ class HomeView extends StatelessWidget {
               title: 'Profile',
               icon: Icons.person,
               onTap: () {
-                Navigator.pushNamed(context, 'ProfileView');
+                Navigator.pushNamed(context, 'ProfileView').then((_) {
+                  setState(() {}); // بعد العودة من صفحة البروفايل
+                });
               },
             ),
             CustomListTile(

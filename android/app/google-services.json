@@ -22,7 +22,15 @@
           }
         },
         {
-          "client_id": "1043624647826-jcpvtrp58j5q22chvkejj0evarjjtevk.apps.googleusercontent.com",
+          "client_id": "1043624647826-vpi8r27gh2s9bf4sn119n335epphma83.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.e_commerce",
+            "certificate_hash": "12212f1693a7f49143310434c8a5b4c29bdc8d41"
+          }
+        },
+        {
+          "client_id": "1043624647826-gmshr6ejt47julcf1b375no0dk1jf0k4.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
