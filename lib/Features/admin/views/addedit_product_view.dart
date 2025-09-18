@@ -95,7 +95,7 @@ class _AddEditProductViewState extends State<AddEditProductView> {
                 DropdownButtonFormField<String>(
                   validator: (value) =>
                       value == null ? "Please select a category" : null,
-                  value: selectedCategoryId,
+                  initialValue: selectedCategoryId,
                   decoration: InputDecoration(labelText: 'Select Category'),
                   items: categories.map((category) {
                     return DropdownMenuItem(

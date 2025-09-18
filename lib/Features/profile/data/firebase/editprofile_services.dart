@@ -21,11 +21,12 @@ class FirebaseEditProfileServices {
     });
   }
 
-  static Stream<UserModel> getCurrentUserStream() {
-    return FirebaseFirestore.instance
+  static Future<UserModel> getCurrentUserData() async {
+    final userRef = FirebaseFirestore.instance
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .snapshots()
-        .map((doc) => UserModel.fromFirestore(doc.data()!, doc.id));
+        .doc(FirebaseAuth.instance.currentUser!.uid);
+
+    final doc = await userRef.get();
+    return UserModel.fromFirestore(doc.data()!, doc.id);
   }
 }

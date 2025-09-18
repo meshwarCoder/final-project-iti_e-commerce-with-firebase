@@ -9,7 +9,9 @@ import 'package:e_commerce/Features/helps&supports/helps_supports_view.dart';
 import 'package:e_commerce/Features/home/cubit/home_cubit.dart';
 import 'package:e_commerce/Features/home/views/home_view.dart';
 import 'package:e_commerce/Features/orders/views/order_view.dart';
-import 'package:e_commerce/Features/profile/views/profile_view.dart';
+import 'package:e_commerce/Features/profile/presentation/cubits/get%20profile%20data%20cubit/get_profile_data_cubit_cubit.dart';
+import 'package:e_commerce/Features/profile/presentation/cubits/update%20profile%20data%20cubit/update_profile_cubit.dart';
+import 'package:e_commerce/Features/profile/presentation/views/profile_view.dart';
 import 'package:e_commerce/Features/splash/views/splash_view.dart';
 import 'package:e_commerce/Features/wishlist/views/wishlist_view.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +35,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => AuthCubit()),
         BlocProvider(create: (context) => HomeCubit()),
         BlocProvider(create: (context) => CartCubit()),
+        BlocProvider(create: (context) => ProfileCubit()),
+        BlocProvider(create: (context) => GetProfileDataCubitCubit()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
